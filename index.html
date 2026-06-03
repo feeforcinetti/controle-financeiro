@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Controle Financeiro</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f0f13; color: #f0ede8; font-family: Georgia, serif; min-height: 100vh; }
+    button { cursor: pointer; font-family: Georgia, serif; }
+    select, input { font-family: Georgia, serif; outline: none; }
+
+    #header {
+      background: linear-gradient(135deg, #1a1a24 0%, #0f0f18 100%);
+      border-bottom: 1px solid #2a2a38;
+      padding: 24px 20px 0;
+    }
+    #header-inner { max-width: 720px; margin: 0 auto; }
+    #title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 14px; }
+    .subtitle { font-size: 11px; letter-spacing: 3px; color: rgba(136,136,136,0.6); text-transform: uppercase; margin-bottom: 4px; }
+    .main-title { font-size: 26px; font-weight: bold; color: #f0ede8; letter-spacing: -0.5px; }
+    .orcamento-label { font-size: 13px; color: #888; margin-top: 2px; }
+    .orcamento-label span { color: #c8b97a; }
+
+    #meses { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 220px; }
+    .mes-btn {
+      padding: 4px 10px; border-radius: 20px; border: none; font-size: 11px;
+      background: #1e1e2a; color: #888; transition: all 0.2s;
+    }
+    .mes-btn.ativo { background: #c8b97a; color: #0f0f13; font-weight: bold; }
+
+    #abas { display: flex; }
+    .aba-btn {
+      padding: 10px 16px; border: none; background: none;
+      font-size: 13px; color: #666;
+      border-bottom: 2px solid transparent; transition: all 0.2s;
+    }
+    .aba-btn.ativa { color: #c8b97a; border-bottom-color: #c8b97a; }
+
+    #content { max-width: 720px; margin: 0 auto; padding: 28px 20px; }
+
+    /* Cards */
+    .cards-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+    .card { background: #1a1a24; border-radius: 14px; padding: 18px 16px; border: 1px solid #2a2a38; }
+    .card-label { font-size: 11px; color: #666; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+    .card-valor { font-size: 20px; font-weight: bold; }
+
+    /* Barra progresso */
+    .box { background: #1a1a24; border-radius: 14px; padding: 20px 24px; border: 1px solid #2a2a38; margin-bottom: 24px; }
+    .prog-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .prog-track { height: 10px; background: #2a2a38; border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
+    .prog-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #555; }
+
+    /* Top gastos */
+    .item-row { margin-bottom: 14px; }
+    .item-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
+    .item-track { height: 5px; background: #2a2a38; border-radius: 99px; }
+    .item-fill { height: 100%; border-radius: 99px; transition: width 0.5s; }
+
+    /* Formulário */
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 12px; color: #666; display: block; margin-bottom: 6px; letter-spacing: 1px; }
+    .form-select, .form-input {
+      width: 100%; padding: 12px 14px;
+      background: #0f0f18; border: 1px solid #2a2a38; border-radius: 10px;
+      color: #f0ede8; font-size: 14px; font-family: Georgia, serif;
+    }
+    .form-input { font-size: 16px; }
+    .btn-primary {
+      width: 100%; padding: 14px; background: #c8b97a; border: none; border-radius: 10px;
+      color: #0f0f13; font-size: 14px; font-weight: bold; font-family: Georgia, serif;
+      letter-spacing: 1px; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-danger {
+      width: 100%; padding: 12px; background: none; border: 1px solid #3a2020;
+      border-radius: 10px; color: #885555; font-size: 12px; font-family: Georgia, serif;
+      margin-top: 14px;
+    }
+
+    /* Categorias */
+    .cat-item {
+      background: #1a1a24; border-radius: 12px; padding: 16px 20px;
+      border: 1px solid #2a2a38; margin-bottom: 10px;
+    }
+    .cat-item.over { border-color: #3a2020; }
+    .cat-row { display: flex; justify-content: space-between; align-items: center; }
+    .cat-left { display: flex; align-items: center; gap: 10px; }
+    .cat-emoji { font-size: 20px; }
+    .cat-nome { font-size: 14px; color: #ddd; }
+    .cat-orcado { font-size: 11px; color: #555; margin-top: 2px; }
+    .cat-valor { font-size: 15px; font-weight: bold; text-align: right; }
+    .cat-livre { font-size: 11px; margin-top: 2px; text-align: right; }
+    .cat-track { height: 4px; background: #2a2a38; border-radius: 99px; margin-top: 12px; }
+    .cat-fill { height: 100%; border-radius: 99px; }
+
+    @media (max-width: 500px) {
+      .cards-grid { grid-template-columns: 1fr 1fr; }
+      .card-valor { font-size: 15px; }
+      #meses { max-width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <div id="header-inner">
+    <div id="title-row">
+      <div>
+        <div class="subtitle">Controle Financeiro</div>
+        <div class="main-title">Meu Orçamento</div>
+        <div class="orcamento-label">Orçamento mensal: <span>R$&nbsp;14.000,00</span></div>
+      </div>
+      <div id="meses"></div>
+    </div>
+    <div id="abas">
+      <button class="aba-btn ativa" onclick="trocarAba('dashboard')">📊 Visão Geral</button>
+      <button class="aba-btn" onclick="trocarAba('lancamentos')">➕ Lançar Gasto</button>
+      <button class="aba-btn" onclick="trocarAba('categorias')">📋 Categorias</button>
+    </div>
+  </div>
+</div>
+
+<div id="content"></div>
+
+<script>
+const ORCAMENTO = 14000;
+const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const CATEGORIAS = [
+  { id: "aluguel",       nome: "Aluguel",       valor: 1200, emoji: "🏠" },
+  { id: "combustivel",   nome: "Combustível",    valor: 850,  emoji: "⛽" },
+  { id: "consorcio",     nome: "Consórcio",      valor: 410,  emoji: "🏦" },
+  { id: "filha",         nome: "Filha",          valor: 1282, emoji: "👧" },
+  { id: "diarista",      nome: "Diarista",       valor: 700,  emoji: "🧹" },
+  { id: "agua",          nome: "Água",           valor: 130,  emoji: "💧" },
+  { id: "luz",           nome: "Luz",            valor: 180,  emoji: "💡" },
+  { id: "internet",      nome: "Internet",       valor: 100,  emoji: "📶" },
+  { id: "terapia",       nome: "Terapia",        valor: 440,  emoji: "🧠" },
+  { id: "streaming",     nome: "Streaming",      valor: 300,  emoji: "📺" },
+  { id: "alimentacao",   nome: "Alimentação",    valor: 2000, emoji: "🛒" },
+  { id: "farmacia",      nome: "Farmácia",       valor: 200,  emoji: "💊" },
+  { id: "vestuario",     nome: "Vestuário",      valor: 400,  emoji: "👗" },
+  { id: "lazer",         nome: "Lazer",          valor: 800,  emoji: "🎉" },
+  { id: "imprevistos",   nome: "Imprevistos",    valor: 500,  emoji: "🛡️" },
+  { id: "investimentos", nome: "Investimentos",  valor: 4508, emoji: "📈" },
+];
+
+const fmt = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+let mesSel = new Date().getMonth();
+let abaAtiva = "dashboard";
+let gastos = JSON.parse(localStorage.getItem("cf_gastos") || "{}");
+
+function salvar() {
+  localStorage.setItem("cf_gastos", JSON.stringify(gastos));
+}
+
+function chave(mes, id) { return `${mes}-${id}`; }
+function getGasto(mes, id) { return gastos[chave(mes, id)] || 0; }
+
+function trocarAba(aba) {
+  abaAtiva = aba;
+  document.querySelectorAll(".aba-btn").forEach((b, i) => {
+    b.classList.toggle("ativa", ["dashboard","lancamentos","categorias"][i] === aba);
+  });
+  renderContent();
+}
+
+function renderMeses() {
+  const el = document.getElementById("meses");
+  el.innerHTML = MESES.map((m, i) =>
+    `<button class="mes-btn ${i === mesSel ? "ativo" : ""}" onclick="selecionarMes(${i})">${m}</button>`
+  ).join("");
+}
+
+function selecionarMes(i) {
+  mesSel = i;
+  renderMeses();
+  renderContent();
+}
+
+function renderContent() {
+  const el = document.getElementById("content");
+  if (abaAtiva === "dashboard") el.innerHTML = renderDashboard();
+  else if (abaAtiva === "lancamentos") el.innerHTML = renderLancamentos();
+  else el.innerHTML = renderCategorias();
+}
+
+function renderDashboard() {
+  const totalGasto = CATEGORIAS.reduce((a, c) => a + getGasto(mesSel, c.id), 0);
+  const saldo = ORCAMENTO - totalGasto;
+  const pct = Math.min((totalGasto / ORCAMENTO) * 100, 100);
+  const corSaldo = saldo >= 0 ? "#5ab88a" : "#e05a5a";
+  const corProg = pct > 90 ? "#e05a5a" : pct > 70 ? "#c8b97a" : "#5ab88a";
+  const investido = getGasto(mesSel, "investimentos");
+
+  const topGastos = [...CATEGORIAS]
+    .map(c => ({ ...c, gasto: getGasto(mesSel, c.id) }))
+    .sort((a, b) => b.gasto - a.gasto)
+    .slice(0, 6);
+
+  return `
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-label">Gasto no mês</div>
+        <div class="card-valor" style="color:#e07b5a">${fmt(totalGasto)}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Saldo disponível</div>
+        <div class="card-valor" style="color:${corSaldo}">${fmt(saldo)}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Investido</div>
+        <div class="card-valor" style="color:#5ab88a">${fmt(investido)}</div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="prog-header">
+        <span style="font-size:13px;color:#aaa">Orçamento utilizado</span>
+        <span style="font-size:13px;color:${corProg};font-weight:bold">${pct.toFixed(1)}%</span>
+      </div>
+      <div class="prog-track">
+        <div class="prog-fill" style="width:${pct}%;background:${corProg}"></div>
+      </div>
+      <div class="prog-labels"><span>${fmt(0)}</span><span>${fmt(ORCAMENTO)}</span></div>
+    </div>
+
+    <div class="box">
+      <div style="font-size:13px;color:#888;margin-bottom:16px;letter-spacing:1px;text-transform:uppercase">Maiores gastos do mês</div>
+      ${topGastos.map(c => {
+        const pctItem = c.valor > 0 ? (c.gasto / c.valor) * 100 : 0;
+        const cor = pctItem > 100 ? "#e05a5a" : pctItem > 80 ? "#c8b97a" : "#5ab88a";
+        return `
+          <div class="item-row">
+            <div class="item-header">
+              <span>${c.emoji} ${c.nome}</span>
+              <span style="color:${c.gasto > c.valor ? "#e05a5a" : "#aaa"}">${fmt(c.gasto)} <span style="color:#555">/ ${fmt(c.valor)}</span></span>
+            </div>
+            <div class="item-track">
+              <div class="item-fill" style="width:${Math.min(pctItem,100)}%;background:${cor}"></div>
+            </div>
+          </div>`;
+      }).join("")}
+    </div>`;
+}
+
+function renderLancamentos() {
+  const opts = CATEGORIAS.map(c =>
+    `<option value="${c.id}">${c.emoji} ${c.nome} (orçado: ${fmt(c.valor)})</option>`
+  ).join("");
+
+  return `
+    <div class="box">
+      <div style="font-size:13px;color:#888;margin-bottom:20px;letter-spacing:1px;text-transform:uppercase">Registrar gasto em ${MESES[mesSel]}</div>
+      <div class="form-group">
+        <label class="form-label">CATEGORIA</label>
+        <select id="sel-cat" class="form-select">${opts}</select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">VALOR (R$)</label>
+        <input id="inp-valor" type="number" placeholder="0,00" class="form-input" />
+      </div>
+      <button class="btn-primary" onclick="registrarGasto()">REGISTRAR GASTO</button>
+    </div>
+    <button class="btn-danger" onclick="resetarMes()">🗑️ Resetar todos os gastos de ${MESES[mesSel]}</button>`;
+}
+
+function renderCategorias() {
+  return `<div>` + CATEGORIAS.map(c => {
+    const gasto = getGasto(mesSel, c.id);
+    const restante = c.valor - gasto;
+    const over = restante < 0;
+    const pctItem = c.valor > 0 ? Math.min((gasto / c.valor) * 100, 100) : 0;
+    const cor = over ? "#e05a5a" : gasto / c.valor > 0.8 ? "#c8b97a" : "#5ab88a";
+    return `
+      <div class="cat-item ${over ? "over" : ""}">
+        <div class="cat-row">
+          <div class="cat-left">
+            <span class="cat-emoji">${c.emoji}</span>
+            <div>
+              <div class="cat-nome">${c.nome}</div>
+              <div class="cat-orcado">Orçado: ${fmt(c.valor)}</div>
+            </div>
+          </div>
+          <div>
+            <div class="cat-valor" style="color:${over ? "#e05a5a" : "#f0ede8"}">${fmt(gasto)}</div>
+            <div class="cat-livre" style="color:${over ? "#e05a5a" : "#5ab88a"}">
+              ${over ? `▲ ${fmt(Math.abs(restante))} acima` : `▼ ${fmt(restante)} livre`}
+            </div>
+          </div>
+        </div>
+        <div class="cat-track">
+          <div class="cat-fill" style="width:${pctItem}%;background:${cor}"></div>
+        </div>
+      </div>`;
+  }).join("") + `</div>`;
+}
+
+function registrarGasto() {
+  const cat = document.getElementById("sel-cat").value;
+  const val = parseFloat(document.getElementById("inp-valor").value);
+  if (!val || isNaN(val) || val <= 0) { alert("Informe um valor válido."); return; }
+  const k = chave(mesSel, cat);
+  gastos[k] = (gastos[k] || 0) + val;
+  salvar();
+  renderContent();
+  // Mostra feedback
+  const btn = document.querySelector(".btn-primary");
+  if (btn) { btn.textContent = "✅ Registrado!"; setTimeout(() => { btn.textContent = "REGISTRAR GASTO"; }, 1500); }
+  document.getElementById("inp-valor").value = "";
+}
+
+function resetarMes() {
+  if (!confirm(`Resetar todos os gastos de ${MESES[mesSel]}?`)) return;
+  CATEGORIAS.forEach(c => delete gastos[chave(mesSel, c.id)]);
+  salvar();
+  renderContent();
+}
+
+// Init
+renderMeses();
+renderContent();
+</script>
+</body>
+</html>
