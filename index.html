@@ -170,6 +170,33 @@
 <div id="content"></div>
 <div id="modal-container"></div>
 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDOp0syXUHtcmXjw2H3Skj0ItSRLfRwhGg",
+  authDomain: "controlefinanceiro-7de79.firebaseapp.com",
+  projectId: "controlefinanceiro-7de79",
+  storageBucket: "controlefinanceiro-7de79.firebasestorage.app",
+  messagingSenderId: "395815796930",
+  appId: "1:395815796930:web:adaed5dc63a9cc67853b5b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.firebaseDB = db;
+window.firebaseDoc = doc;
+window.firebaseSetDoc = setDoc;
+window.firebaseOnSnapshot = onSnapshot;
+</script>  
+
 <script>
 const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 
@@ -197,14 +224,32 @@ const fmt = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" 
 // Estado
 let mesSel = new Date().getMonth();
 let abaAtiva = "dashboard";
-let gastos = JSON.parse(localStorage.getItem("cf_gastos") || "{}");
-let categorias = JSON.parse(localStorage.getItem("cf_cats") || JSON.stringify(CATS_DEFAULT));
-let orcamento = parseFloat(localStorage.getItem("cf_orcamento") || "14000");
+let gastos = {};
+let categorias = JSON.parse(JSON.stringify(CATS_DEFAULT));
+let orcamento = 14000;
 
-function salvar() {
-  localStorage.setItem("cf_gastos", JSON.stringify(gastos));
-  localStorage.setItem("cf_cats", JSON.stringify(categorias));
-  localStorage.setItem("cf_orcamento", String(orcamento));
+async function salvar() {
+
+  try {
+
+    if (!window.firebaseDB) return;
+
+    await firebaseSetDoc(
+      firebaseDoc(window.firebaseDB, "financeiro", "principal"),
+      {
+        gastos,
+        categorias,
+        orcamento
+      }
+    );
+
+  } catch (erro) {
+
+    console.error("Erro ao salvar:", erro);
+
+    alert("Erro ao salvar dados no Firebase.");
+
+  }
 }
 
 function chave(mes, id) { return `${mes}-${id}`; }
@@ -472,10 +517,47 @@ function resetarMes() {
   renderContent();
 }
 
+function iniciarSincronizacao() {
+
+  firebaseOnSnapshot(
+    firebaseDoc(window.firebaseDB, "financeiro", "principal"),
+    (snapshot) => {
+
+      const dados = snapshot.data();
+
+      if (!dados) return;
+
+      gastos = dados.gastos || {};
+
+      categorias =
+        dados.categorias ||
+        JSON.parse(JSON.stringify(CATS_DEFAULT));
+
+      orcamento = dados.orcamento || 14000;
+
+      renderHeader();
+      renderMeses();
+      renderContent();
+    }
+  );
+}
+
 // Init
+function aguardarFirebase() {
+
+  if (!window.firebaseDB) {
+    setTimeout(aguardarFirebase, 200);
+    return;
+  }
+
+  iniciarSincronizacao();
+}
+
 renderHeader();
 renderMeses();
 renderContent();
+
+aguardarFirebase();
 </script>
 </body>
 </html>
