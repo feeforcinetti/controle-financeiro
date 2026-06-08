@@ -8,139 +8,261 @@
   <meta name="apple-mobile-web-app-title" content="Finanças">
   <title>Controle Financeiro</title>
   <style>
+    :root {
+      --bg: #0f0f13;
+      --bg2: #1a1a24;
+      --bg3: #0f0f18;
+      --border: #2a2a38;
+      --text: #f0ede8;
+      --text2: #aaa;
+      --text3: #666;
+      --text4: #555;
+      --gold: #c8b97a;
+      --green: #5ab88a;
+      --red: #e05a5a;
+      --orange: #e07b5a;
+      --header-bg: linear-gradient(135deg, #1a1a24 0%, #0f0f18 100%);
+      --shadow: rgba(0,0,0,0.4);
+      --modal-bg: rgba(0,0,0,0.75);
+      --input-border-focus: #c8b97a;
+      --btn-secondary-bg: #2a2a38;
+      --over-border: #3a2020;
+      --over-color: #885555;
+      --progress-track: #2a2a38;
+    }
+    [data-theme="light"] {
+      --bg: #f4f1ec;
+      --bg2: #ffffff;
+      --bg3: #f9f7f4;
+      --border: #e0d9ce;
+      --text: #1a1612;
+      --text2: #5a5248;
+      --text3: #8a8078;
+      --text4: #aaa098;
+      --gold: #9a7c2a;
+      --green: #2e8a5a;
+      --red: #c03838;
+      --orange: #b85a38;
+      --header-bg: linear-gradient(135deg, #ffffff 0%, #f4f1ec 100%);
+      --shadow: rgba(0,0,0,0.12);
+      --modal-bg: rgba(30,20,10,0.55);
+      --input-border-focus: #9a7c2a;
+      --btn-secondary-bg: #e8e3db;
+      --over-border: #e8c8c8;
+      --over-color: #c03838;
+      --progress-track: #e0d9ce;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { background: #0f0f13; color: #f0ede8; font-family: Georgia, serif; min-height: 100vh; padding-bottom: 40px; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: Georgia, serif; min-height: 100vh; padding-bottom: 40px;
+      transition: background 0.3s, color 0.3s;
+    }
     button { cursor: pointer; font-family: Georgia, serif; }
     select, input { font-family: Georgia, serif; outline: none; }
 
     #header {
-      background: linear-gradient(135deg, #1a1a24 0%, #0f0f18 100%);
-      border-bottom: 1px solid #2a2a38;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border);
       padding: 20px 16px 0;
       position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px var(--shadow);
+      transition: background 0.3s, border-color 0.3s;
     }
     #header-inner { max-width: 720px; margin: 0 auto; }
     #title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .subtitle { font-size: 10px; letter-spacing: 3px; color: rgba(136,136,136,0.6); text-transform: uppercase; margin-bottom: 3px; }
-    .main-title { font-size: 22px; font-weight: bold; color: #f0ede8; }
-    .orcamento-label { font-size: 12px; color: #888; margin-top: 2px; }
-    .orcamento-label span { color: #c8b97a; }
+    .subtitle { font-size: 10px; letter-spacing: 3px; color: var(--text3); text-transform: uppercase; margin-bottom: 3px; }
+    .main-title { font-size: 22px; font-weight: bold; color: var(--text); }
+    .orcamento-label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+    .orcamento-label span { color: var(--gold); }
 
-    /* Meses — maiores e mais fáceis de tocar */
-    #meses-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; margin: 0 -16px; padding: 0 16px 2px; }
+    /* Theme toggle */
+    .theme-btn {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 50px; padding: 8px 14px; font-size: 13px;
+      color: var(--text2); display: flex; align-items: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .theme-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    #meses-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -16px; padding: 0 16px 2px; }
     #meses { display: flex; gap: 8px; width: max-content; padding-bottom: 10px; }
     .mes-btn {
       padding: 10px 16px; border-radius: 24px; border: none; font-size: 14px; font-weight: bold;
-      background: #1e1e2a; color: #888; transition: all 0.2s; white-space: nowrap; min-width: 52px;
-      letter-spacing: 0.3px;
+      background: var(--bg2); color: var(--text3); transition: all 0.2s; white-space: nowrap; min-width: 52px;
+      letter-spacing: 0.3px; border: 1px solid var(--border);
     }
-    .mes-btn.ativo { background: #c8b97a; color: #0f0f13; }
+    .mes-btn.ativo { background: var(--gold); color: #fff; border-color: var(--gold); }
+    [data-theme="light"] .mes-btn.ativo { color: #1a1612; }
 
     #abas { display: flex; margin-top: 4px; }
     .aba-btn {
       flex: 1; padding: 12px 6px; border: none; background: none;
-      font-size: 12px; color: #666; border-bottom: 2px solid transparent; transition: all 0.2s;
+      font-size: 12px; color: var(--text3); border-bottom: 2px solid transparent; transition: all 0.2s;
       text-align: center;
     }
-    .aba-btn.ativa { color: #c8b97a; border-bottom-color: #c8b97a; }
+    .aba-btn.ativa { color: var(--gold); border-bottom-color: var(--gold); }
 
     #content { max-width: 720px; margin: 0 auto; padding: 22px 16px; }
 
     .cards-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .card { background: #1a1a24; border-radius: 14px; padding: 16px 12px; border: 1px solid #2a2a38; }
-    .card-label { font-size: 10px; color: #666; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+    .card {
+      background: var(--bg2); border-radius: 14px; padding: 16px 12px;
+      border: 1px solid var(--border); transition: background 0.3s, border-color 0.3s;
+    }
+    .card-label { font-size: 10px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
     .card-valor { font-size: 17px; font-weight: bold; }
 
-    .box { background: #1a1a24; border-radius: 14px; padding: 18px 18px; border: 1px solid #2a2a38; margin-bottom: 18px; }
-    .box-title { font-size: 11px; color: #888; margin-bottom: 14px; letter-spacing: 1px; text-transform: uppercase; }
+    .box {
+      background: var(--bg2); border-radius: 14px; padding: 18px;
+      border: 1px solid var(--border); margin-bottom: 18px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .box-title { font-size: 11px; color: var(--text3); margin-bottom: 14px; letter-spacing: 1px; text-transform: uppercase; }
     .prog-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-    .prog-track { height: 10px; background: #2a2a38; border-radius: 99px; overflow: hidden; }
+    .prog-track { height: 10px; background: var(--progress-track); border-radius: 99px; overflow: hidden; }
     .prog-fill { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
-    .prog-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #555; }
+    .prog-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text4); }
 
     .item-row { margin-bottom: 14px; }
     .item-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
-    .item-track { height: 5px; background: #2a2a38; border-radius: 99px; }
+    .item-track { height: 5px; background: var(--progress-track); border-radius: 99px; }
     .item-fill { height: 100%; border-radius: 99px; transition: width 0.5s; }
 
     /* Formulário */
     .form-group { margin-bottom: 16px; }
-    .form-label { font-size: 11px; color: #666; display: block; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+    .form-label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
     .form-select, .form-input {
-      width: 100%; padding: 14px; background: #0f0f18;
-      border: 1px solid #2a2a38; border-radius: 12px;
-      color: #f0ede8; font-size: 16px; font-family: Georgia, serif;
-      -webkit-appearance: none;
+      width: 100%; padding: 14px; background: var(--bg3);
+      border: 1px solid var(--border); border-radius: 12px;
+      color: var(--text); font-size: 16px; font-family: Georgia, serif;
+      -webkit-appearance: none; transition: border-color 0.2s, background 0.3s;
     }
+    .form-select:focus, .form-input:focus { border-color: var(--gold); }
     .btn-primary {
-      width: 100%; padding: 16px; background: #c8b97a; border: none; border-radius: 12px;
-      color: #0f0f13; font-size: 15px; font-weight: bold; font-family: Georgia, serif;
-      letter-spacing: 1px;
+      width: 100%; padding: 16px; background: var(--gold); border: none; border-radius: 12px;
+      color: #fff; font-size: 15px; font-weight: bold; font-family: Georgia, serif;
+      letter-spacing: 1px; transition: opacity 0.2s, transform 0.1s;
     }
+    [data-theme="light"] .btn-primary { color: #1a1612; }
+    .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
     .btn-secondary {
-      width: 100%; padding: 14px; background: none; border: 1px solid #2a2a38;
-      border-radius: 12px; color: #888; font-size: 13px; font-family: Georgia, serif;
+      width: 100%; padding: 14px; background: var(--btn-secondary-bg); border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text2); font-size: 13px; font-family: Georgia, serif;
       margin-top: 10px;
     }
     .btn-danger {
-      width: 100%; padding: 14px; background: none; border: 1px solid #3a2020;
-      border-radius: 12px; color: #885555; font-size: 13px; font-family: Georgia, serif;
+      width: 100%; padding: 14px; background: none; border: 1px solid var(--over-border);
+      border-radius: 12px; color: var(--over-color); font-size: 13px; font-family: Georgia, serif;
       margin-top: 10px;
     }
 
     /* Categorias */
     .cat-item {
-      background: #1a1a24; border-radius: 12px; padding: 16px;
-      border: 1px solid #2a2a38; margin-bottom: 10px;
+      background: var(--bg2); border-radius: 12px; padding: 16px;
+      border: 1px solid var(--border); margin-bottom: 10px;
+      transition: background 0.3s, border-color 0.3s;
     }
-    .cat-item.over { border-color: #3a2020; }
+    .cat-item.over { border-color: var(--over-border); }
     .cat-row { display: flex; justify-content: space-between; align-items: center; }
     .cat-left { display: flex; align-items: center; gap: 10px; }
     .cat-emoji { font-size: 20px; }
-    .cat-nome { font-size: 14px; color: #ddd; }
-    .cat-orcado { font-size: 11px; color: #555; margin-top: 2px; }
+    .cat-nome { font-size: 14px; color: var(--text); }
+    .cat-orcado { font-size: 11px; color: var(--text4); margin-top: 2px; }
     .cat-valor { font-size: 15px; font-weight: bold; text-align: right; }
     .cat-livre { font-size: 11px; margin-top: 2px; text-align: right; }
-    .cat-track { height: 4px; background: #2a2a38; border-radius: 99px; margin-top: 12px; }
+    .cat-track { height: 4px; background: var(--progress-track); border-radius: 99px; margin-top: 12px; }
     .cat-fill { height: 100%; border-radius: 99px; }
 
-    /* Modal de edição */
+    /* Lançamentos individuais */
+    .lancamento-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .lancamento-item:last-child { border-bottom: none; }
+    .lanc-left { display: flex; align-items: center; gap: 10px; }
+    .lanc-emoji { font-size: 18px; }
+    .lanc-info { }
+    .lanc-nome { font-size: 13px; color: var(--text); }
+    .lanc-data { font-size: 11px; color: var(--text4); margin-top: 2px; }
+    .lanc-valor { font-size: 14px; font-weight: bold; color: var(--red); }
+    .lanc-del-btn {
+      background: none; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 14px; color: var(--text4); margin-left: 10px;
+      transition: all 0.2s;
+    }
+    .lanc-del-btn:hover { border-color: var(--red); color: var(--red); background: var(--over-border); }
+
+    /* Modal */
     .modal-bg {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      position: fixed; inset: 0; background: var(--modal-bg);
       display: flex; align-items: flex-end; z-index: 200;
       animation: fadeIn 0.2s;
     }
     @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
     .modal {
-      background: #1a1a24; border-radius: 24px 24px 0 0;
+      background: var(--bg2); border-radius: 24px 24px 0 0;
       padding: 24px 20px 40px; width: 100%; max-width: 720px; margin: 0 auto;
-      border-top: 1px solid #2a2a38;
+      border-top: 1px solid var(--border);
       animation: slideUp 0.25s ease;
     }
     @keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
-    .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 20px; color: #f0ede8; }
+    .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 20px; color: var(--text); }
     .modal-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 0; border-bottom: 1px solid #2a2a38;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
     }
     .modal-row:last-of-type { border-bottom: none; }
-    .modal-nome { font-size: 14px; color: #ddd; }
+    .modal-nome { font-size: 14px; color: var(--text2); }
     .modal-input {
-      width: 130px; padding: 8px 12px; background: #0f0f18;
-      border: 1px solid #2a2a38; border-radius: 10px;
-      color: #c8b97a; font-size: 15px; font-family: Georgia, serif;
+      width: 130px; padding: 8px 12px; background: var(--bg3);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--gold); font-size: 15px; font-family: Georgia, serif;
       text-align: right;
     }
     .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
     .modal-btns button { flex: 1; padding: 14px; border-radius: 12px; font-size: 14px; font-family: Georgia, serif; border: none; }
-    .btn-cancelar { background: #2a2a38; color: #888; }
-    .btn-salvar { background: #c8b97a; color: #0f0f13; font-weight: bold; }
+    .btn-cancelar { background: var(--btn-secondary-bg); color: var(--text2); }
+    .btn-salvar { background: var(--gold); color: #fff; font-weight: bold; }
+    [data-theme="light"] .btn-salvar { color: #1a1612; }
 
-    /* Orcamento geral */
+    /* Orçamento header */
     .orc-edit-btn {
-      background: none; border: 1px solid #2a2a38; border-radius: 8px;
-      padding: 4px 10px; font-size: 11px; color: #888; margin-left: 8px;
+      background: none; border: 1px solid var(--border); border-radius: 8px;
+      padding: 4px 10px; font-size: 11px; color: var(--text3); margin-left: 8px;
+      transition: all 0.2s;
     }
+    .orc-edit-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Nova categoria */
+    .nova-cat-box {
+      background: var(--bg2); border-radius: 14px; padding: 18px;
+      border: 2px dashed var(--border); margin-bottom: 18px;
+      transition: border-color 0.2s;
+    }
+    .nova-cat-box:hover { border-color: var(--gold); }
+    .emoji-grid {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+    }
+    .emoji-opt {
+      font-size: 22px; padding: 8px; border-radius: 10px; cursor: pointer;
+      border: 2px solid transparent; background: var(--bg3); transition: all 0.15s;
+    }
+    .emoji-opt:hover, .emoji-opt.sel { border-color: var(--gold); background: var(--bg2); }
+
+    /* Excluir categoria */
+    .cat-del-btn {
+      background: none; border: 1px solid var(--border); border-radius: 8px;
+      padding: 5px 8px; font-size: 12px; color: var(--text4); margin-top: 10px;
+      transition: all 0.2s; float: right;
+    }
+    .cat-del-btn:hover { border-color: var(--red); color: var(--red); }
+
+    .empty-state {
+      text-align: center; padding: 30px 0; color: var(--text4); font-size: 14px;
+    }
+    .empty-state span { font-size: 32px; display: block; margin-bottom: 8px; }
   </style>
 </head>
 <body>
@@ -156,6 +278,7 @@
           <button class="orc-edit-btn" onclick="abrirModalOrcamento()">✏️ Editar</button>
         </div>
       </div>
+      <button class="theme-btn" onclick="alternarTema()" id="theme-btn">🌙 Escuro</button>
     </div>
     <div id="meses-wrap"><div id="meses"></div></div>
     <div id="abas">
@@ -173,10 +296,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import {
-  getFirestore,
-  doc,
-  setDoc,
-  onSnapshot
+  getFirestore, doc, setDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -187,15 +307,13 @@ const firebaseConfig = {
   messagingSenderId: "395815796930",
   appId: "1:395815796930:web:adaed5dc63a9cc67853b5b"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 window.firebaseDB = db;
 window.firebaseDoc = doc;
 window.firebaseSetDoc = setDoc;
 window.firebaseOnSnapshot = onSnapshot;
-</script>  
+</script>
 
 <script>
 const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -219,42 +337,70 @@ const CATS_DEFAULT = [
   { id: "investimentos", nome: "Investimentos",  valor: 4508, emoji: "📈" },
 ];
 
-const fmt = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const EMOJIS_DISPONIVEIS = ["🏠","⛽","🏦","👧","🧹","💧","💡","📶","🧠","📺","🛒","💊","👗","🎉","🛡️","📈","🍕","🚗","🐶","💼","🎓","✈️","🏋️","🎮","☕","🌿","🎁","🏥","📚","🎵","👶","🐱","🏖️","🍷","🚀","💻","🔧","🧴","🌍","❤️"];
 
-// Estado
+const fmt = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
 let mesSel = new Date().getMonth();
 let abaAtiva = "dashboard";
+// gastos: { "mes-catId": [ {id, valor, data, nota?} ] }
 let gastos = {};
 let categorias = JSON.parse(JSON.stringify(CATS_DEFAULT));
 let orcamento = 14000;
+let tema = "dark";
 
+// ---- Tema ----
+function alternarTema() {
+  tema = tema === "dark" ? "light" : "dark";
+  aplicarTema();
+  localStorage.setItem("cf_tema", tema);
+}
+function aplicarTema() {
+  document.documentElement.setAttribute("data-theme", tema === "light" ? "light" : "");
+  const btn = document.getElementById("theme-btn");
+  if (btn) btn.textContent = tema === "light" ? "🌙 Escuro" : "☀️ Claro";
+}
+
+// ---- Firebase ----
 async function salvar() {
-
   try {
-
     if (!window.firebaseDB) return;
-
     await firebaseSetDoc(
       firebaseDoc(window.firebaseDB, "financeiro", "principal"),
-      {
-        gastos,
-        categorias,
-        orcamento
-      }
+      { gastos, categorias, orcamento }
     );
-
-  } catch (erro) {
-
-    console.error("Erro ao salvar:", erro);
-
+  } catch (e) {
+    console.error("Erro ao salvar:", e);
     alert("Erro ao salvar dados no Firebase.");
-
   }
 }
 
+// ---- Gastos (agora são arrays de lançamentos) ----
 function chave(mes, id) { return `${mes}-${id}`; }
-function getGasto(mes, id) { return gastos[chave(mes, id)] || 0; }
 
+function getLancamentos(mes, id) {
+  return gastos[chave(mes, id)] || [];
+}
+
+function getTotalGasto(mes, id) {
+  return getLancamentos(mes, id).reduce((a, l) => a + (l.valor || 0), 0);
+}
+
+// Migração: se vier número, converte para array
+function migrarGastos(g) {
+  const novo = {};
+  for (const k in g) {
+    if (typeof g[k] === "number") {
+      novo[k] = g[k] > 0 ? [{ id: uid(), valor: g[k], data: new Date().toLocaleDateString("pt-BR"), nota: "Migrado" }] : [];
+    } else {
+      novo[k] = Array.isArray(g[k]) ? g[k] : [];
+    }
+  }
+  return novo;
+}
+
+// ---- Render ----
 function trocarAba(aba) {
   abaAtiva = aba;
   document.querySelectorAll(".aba-btn").forEach((b, i) => {
@@ -289,23 +435,22 @@ function renderContent() {
 
 // DASHBOARD
 function renderDashboard() {
-  const totalGasto = categorias.reduce((a, c) => a + getGasto(mesSel, c.id), 0);
+  const totalGasto = categorias.reduce((a, c) => a + getTotalGasto(mesSel, c.id), 0);
   const saldo = orcamento - totalGasto;
   const pct = Math.min((totalGasto / orcamento) * 100, 100);
-  const corSaldo = saldo >= 0 ? "#5ab88a" : "#e05a5a";
-  const corProg = pct > 90 ? "#e05a5a" : pct > 70 ? "#c8b97a" : "#5ab88a";
-  const investido = getGasto(mesSel, "investimentos");
+  const corSaldo = saldo >= 0 ? "var(--green)" : "var(--red)";
+  const corProg = pct > 90 ? "var(--red)" : pct > 70 ? "var(--gold)" : "var(--green)";
+  const investido = getTotalGasto(mesSel, "investimentos");
 
   const topGastos = [...categorias]
-    .map(c => ({ ...c, gasto: getGasto(mesSel, c.id) }))
-    .sort((a, b) => b.gasto - a.gasto)
-    .slice(0, 6);
+    .map(c => ({ ...c, gasto: getTotalGasto(mesSel, c.id) }))
+    .sort((a, b) => b.gasto - a.gasto).slice(0, 6);
 
   return `
     <div class="cards-grid">
       <div class="card">
         <div class="card-label">Gasto</div>
-        <div class="card-valor" style="color:#e07b5a">${fmt(totalGasto)}</div>
+        <div class="card-valor" style="color:var(--orange)">${fmt(totalGasto)}</div>
       </div>
       <div class="card">
         <div class="card-label">Saldo</div>
@@ -313,45 +458,64 @@ function renderDashboard() {
       </div>
       <div class="card">
         <div class="card-label">Investido</div>
-        <div class="card-valor" style="color:#5ab88a">${fmt(investido)}</div>
+        <div class="card-valor" style="color:var(--green)">${fmt(investido)}</div>
       </div>
     </div>
-
     <div class="box">
       <div class="prog-header">
-        <span style="font-size:13px;color:#aaa">Orçamento utilizado</span>
+        <span style="font-size:13px;color:var(--text2)">Orçamento utilizado</span>
         <span style="font-size:13px;color:${corProg};font-weight:bold">${pct.toFixed(1)}%</span>
       </div>
-      <div class="prog-track">
-        <div class="prog-fill" style="width:${pct}%;background:${corProg}"></div>
-      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${corProg}"></div></div>
       <div class="prog-labels"><span>${fmt(0)}</span><span>${fmt(orcamento)}</span></div>
     </div>
-
     <div class="box">
       <div class="box-title">Maiores gastos do mês</div>
       ${topGastos.map(c => {
-        const pctItem = c.valor > 0 ? (c.gasto / c.valor) * 100 : 0;
-        const cor = pctItem > 100 ? "#e05a5a" : pctItem > 80 ? "#c8b97a" : "#5ab88a";
-        return `
-          <div class="item-row">
-            <div class="item-header">
-              <span>${c.emoji} ${c.nome}</span>
-              <span style="color:${c.gasto > c.valor ? "#e05a5a" : "#aaa"}">${fmt(c.gasto)} <span style="color:#555">/ ${fmt(c.valor)}</span></span>
-            </div>
-            <div class="item-track">
-              <div class="item-fill" style="width:${Math.min(pctItem,100)}%;background:${cor}"></div>
-            </div>
-          </div>`;
+        const pctI = c.valor > 0 ? (c.gasto / c.valor) * 100 : 0;
+        const cor = pctI > 100 ? "var(--red)" : pctI > 80 ? "var(--gold)" : "var(--green)";
+        return `<div class="item-row">
+          <div class="item-header">
+            <span>${c.emoji} ${c.nome}</span>
+            <span style="color:${c.gasto > c.valor ? "var(--red)" : "var(--text2)"}">${fmt(c.gasto)} <span style="color:var(--text4)">/ ${fmt(c.valor)}</span></span>
+          </div>
+          <div class="item-track"><div class="item-fill" style="width:${Math.min(pctI,100)}%;background:${cor}"></div></div>
+        </div>`;
       }).join("")}
     </div>`;
 }
 
-// LANÇAMENTOS
+// LANÇAMENTOS — agora com listagem e exclusão individual
 function renderLancamentos() {
   const opts = categorias.map(c =>
     `<option value="${c.id}">${c.emoji} ${c.nome} (orçado: ${fmt(c.valor)})</option>`
   ).join("");
+
+  // Todos os lançamentos do mês, ordenados por data decrescente (mais recentes primeiro)
+  const todos = [];
+  categorias.forEach(c => {
+    getLancamentos(mesSel, c.id).forEach(l => {
+      todos.push({ ...l, catId: c.id, catNome: c.nome, catEmoji: c.emoji });
+    });
+  });
+  todos.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+  const listaHTML = todos.length === 0
+    ? `<div class="empty-state"><span>📭</span>Nenhum lançamento em ${MESES[mesSel]}</div>`
+    : todos.map(l => `
+        <div class="lancamento-item">
+          <div class="lanc-left">
+            <span class="lanc-emoji">${l.catEmoji}</span>
+            <div class="lanc-info">
+              <div class="lanc-nome">${l.catNome}</div>
+              <div class="lanc-data">${l.data}${l.nota ? " · " + l.nota : ""}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="lanc-valor">${fmt(l.valor)}</span>
+            <button class="lanc-del-btn" onclick="excluirLancamento('${l.catId}','${l.id}')" title="Excluir">🗑️</button>
+          </div>
+        </div>`).join("");
 
   return `
     <div class="box">
@@ -364,19 +528,27 @@ function renderLancamentos() {
         <label class="form-label">Valor (R$)</label>
         <input id="inp-valor" type="number" placeholder="0,00" class="form-input" inputmode="decimal"/>
       </div>
+      <div class="form-group">
+        <label class="form-label">Nota (opcional)</label>
+        <input id="inp-nota" type="text" placeholder="Ex: supermercado, posto..." class="form-input"/>
+      </div>
       <button class="btn-primary" onclick="registrarGasto()">REGISTRAR GASTO</button>
     </div>
-    <button class="btn-danger" onclick="resetarMes()">🗑️ Resetar gastos de ${MESES[mesSel]}</button>`;
+    <div class="box">
+      <div class="box-title">Lançamentos de ${MESES[mesSel]} (${todos.length})</div>
+      ${listaHTML}
+    </div>
+    <button class="btn-danger" onclick="resetarMes()">🗑️ Resetar todos os gastos de ${MESES[mesSel]}</button>`;
 }
 
 // CATEGORIAS
 function renderCategorias() {
-  return `<div>` + categorias.map(c => {
-    const gasto = getGasto(mesSel, c.id);
+  const cats = categorias.map(c => {
+    const gasto = getTotalGasto(mesSel, c.id);
     const restante = c.valor - gasto;
     const over = restante < 0;
     const pctItem = c.valor > 0 ? Math.min((gasto / c.valor) * 100, 100) : 0;
-    const cor = over ? "#e05a5a" : gasto / c.valor > 0.8 ? "#c8b97a" : "#5ab88a";
+    const cor = over ? "var(--red)" : gasto / c.valor > 0.8 ? "var(--gold)" : "var(--green)";
     return `
       <div class="cat-item ${over ? "over" : ""}">
         <div class="cat-row">
@@ -388,63 +560,104 @@ function renderCategorias() {
             </div>
           </div>
           <div>
-            <div class="cat-valor" style="color:${over ? "#e05a5a" : "#f0ede8"}">${fmt(gasto)}</div>
-            <div class="cat-livre" style="color:${over ? "#e05a5a" : "#5ab88a"}">
+            <div class="cat-valor" style="color:${over ? "var(--red)" : "var(--text)"}">${fmt(gasto)}</div>
+            <div class="cat-livre" style="color:${over ? "var(--red)" : "var(--green)"}">
               ${over ? `▲ ${fmt(Math.abs(restante))} acima` : `▼ ${fmt(restante)} livre`}
             </div>
           </div>
         </div>
-        <div class="cat-track">
-          <div class="cat-fill" style="width:${pctItem}%;background:${cor}"></div>
-        </div>
+        <div class="cat-track"><div class="cat-fill" style="width:${pctItem}%;background:${cor}"></div></div>
+        ${!CATS_DEFAULT.find(d => d.id === c.id) ? `<button class="cat-del-btn" onclick="excluirCategoria('${c.id}')">🗑️ Excluir categoria</button>` : ""}
       </div>`;
-  }).join("") + `</div>`;
+  }).join("");
+
+  return `${cats}
+    <div class="nova-cat-box">
+      <div class="box-title" style="margin-bottom:12px">➕ Nova Categoria</div>
+      <div class="form-group">
+        <label class="form-label">Nome</label>
+        <input id="nc-nome" type="text" class="form-input" placeholder="Ex: Academia"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Orçamento (R$)</label>
+        <input id="nc-valor" type="number" class="form-input" placeholder="0,00" inputmode="decimal"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji</label>
+        <div class="emoji-grid" id="emoji-grid">
+          ${EMOJIS_DISPONIVEIS.map(e => `<span class="emoji-opt" onclick="selecionarEmoji(this,'${e}')">${e}</span>`).join("")}
+        </div>
+      </div>
+      <button class="btn-primary" onclick="adicionarCategoria()">✅ CRIAR CATEGORIA</button>
+    </div>`;
 }
 
-// ABA ORÇAMENTO — editar valores
+let emojiSelecionado = "⭐";
+function selecionarEmoji(el, emoji) {
+  document.querySelectorAll(".emoji-opt").forEach(e => e.classList.remove("sel"));
+  el.classList.add("sel");
+  emojiSelecionado = emoji;
+}
+
+function adicionarCategoria() {
+  const nome = (document.getElementById("nc-nome").value || "").trim();
+  const valor = parseFloat(document.getElementById("nc-valor").value);
+  if (!nome) { alert("Informe o nome da categoria."); return; }
+  if (isNaN(valor) || valor < 0) { alert("Informe um valor orçado válido."); return; }
+  const id = "cat_" + uid();
+  categorias.push({ id, nome, valor, emoji: emojiSelecionado || "⭐" });
+  salvar();
+  renderContent();
+}
+
+function excluirCategoria(id) {
+  if (!confirm("Excluir esta categoria e todos seus lançamentos?")) return;
+  categorias = categorias.filter(c => c.id !== id);
+  // Remover lançamentos
+  for (const k in gastos) {
+    if (k.includes(`-${id}`)) delete gastos[k];
+  }
+  salvar();
+  renderContent();
+}
+
+// ABA ORÇAMENTO
 function renderOrcamento() {
   const totalOrcado = categorias.reduce((a, c) => a + c.valor, 0);
   const diff = orcamento - totalOrcado;
-  const corDiff = diff >= 0 ? "#5ab88a" : "#e05a5a";
-
+  const corDiff = diff >= 0 ? "var(--green)" : "var(--red)";
   return `
     <div class="box" style="margin-bottom:14px">
       <div class="box-title">Resumo do orçamento</div>
       <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px">
-        <span style="color:#aaa">Orçamento total</span>
-        <span style="color:#c8b97a;font-weight:bold">${fmt(orcamento)}</span>
+        <span style="color:var(--text2)">Orçamento total</span>
+        <span style="color:var(--gold);font-weight:bold">${fmt(orcamento)}</span>
       </div>
       <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px">
-        <span style="color:#aaa">Total alocado</span>
-        <span style="color:#f0ede8">${fmt(totalOrcado)}</span>
+        <span style="color:var(--text2)">Total alocado</span>
+        <span style="color:var(--text)">${fmt(totalOrcado)}</span>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;padding-top:10px;border-top:1px solid #2a2a38">
-        <span style="color:#aaa">${diff >= 0 ? "Não alocado" : "Acima do orçamento"}</span>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding-top:10px;border-top:1px solid var(--border)">
+        <span style="color:var(--text2)">${diff >= 0 ? "Não alocado" : "Acima do orçamento"}</span>
         <span style="color:${corDiff};font-weight:bold">${fmt(Math.abs(diff))}</span>
       </div>
     </div>
-
     <div class="box">
       <div class="box-title">Editar valores por categoria</div>
-      ${categorias.map((c, i) => `
+      ${categorias.map(c => `
         <div class="modal-row">
-          <div>
-            <div style="font-size:14px;color:#ddd">${c.emoji} ${c.nome}</div>
-          </div>
+          <div style="font-size:14px;color:var(--text2)">${c.emoji} ${c.nome}</div>
           <input class="modal-input" type="number" inputmode="decimal"
             id="orc-${c.id}" value="${c.valor}" onchange="atualizarCategoria('${c.id}', this.value)" />
         </div>`).join("")}
     </div>
-
     <button class="btn-primary" onclick="salvarOrcamento()" style="margin-bottom:10px">💾 SALVAR ALTERAÇÕES</button>
     <button class="btn-secondary" onclick="restaurarPadrao()">↩️ Restaurar valores originais</button>`;
 }
 
 function atualizarCategoria(id, val) {
   const v = parseFloat(val);
-  if (!isNaN(v) && v >= 0) {
-    categorias = categorias.map(c => c.id === id ? { ...c, valor: v } : c);
-  }
+  if (!isNaN(v) && v >= 0) categorias = categorias.map(c => c.id === id ? { ...c, valor: v } : c);
 }
 
 function salvarOrcamento() {
@@ -452,7 +665,7 @@ function salvarOrcamento() {
   renderContent();
   renderHeader();
   const btn = document.querySelector(".btn-primary");
-  if (btn) { btn.textContent = "✅ Salvo!"; setTimeout(() => { btn.textContent = "💾 SALVAR ALTERAÇÕES"; }, 1500); }
+  if (btn) { btn.textContent = "✅ Salvo!"; setTimeout(() => btn.textContent = "💾 SALVAR ALTERAÇÕES", 1500); }
 }
 
 function restaurarPadrao() {
@@ -483,31 +696,49 @@ function abrirModalOrcamento() {
 function salvarOrcamentoGeral() {
   const v = parseFloat(document.getElementById("inp-orcamento").value);
   if (!isNaN(v) && v > 0) {
-    orcamento = v;
-    salvar();
-    renderHeader();
-    renderContent();
+    orcamento = v; salvar(); renderHeader(); renderContent();
   }
   fecharModal();
 }
 
 function fecharModal(e) {
-  if (!e || e.target.classList.contains("modal-bg")) {
+  if (!e || e.target.classList.contains("modal-bg"))
     document.getElementById("modal-container").innerHTML = "";
-  }
 }
 
+// REGISTRAR GASTO — agora como lançamento individual
 function registrarGasto() {
   const cat = document.getElementById("sel-cat").value;
   const val = parseFloat(document.getElementById("inp-valor").value);
+  const nota = (document.getElementById("inp-nota").value || "").trim();
   if (!val || isNaN(val) || val <= 0) { alert("Informe um valor válido."); return; }
   const k = chave(mesSel, cat);
-  gastos[k] = (gastos[k] || 0) + val;
+  if (!gastos[k]) gastos[k] = [];
+  gastos[k].push({
+    id: uid(),
+    valor: val,
+    nota: nota || "",
+    data: new Date().toLocaleDateString("pt-BR"),
+    ts: Date.now()
+  });
   salvar();
   renderContent();
   const btn = document.querySelector(".btn-primary");
-  if (btn) { btn.textContent = "✅ Registrado!"; setTimeout(() => { btn.textContent = "REGISTRAR GASTO"; }, 1500); }
+  if (btn) { btn.textContent = "✅ Registrado!"; setTimeout(() => btn.textContent = "REGISTRAR GASTO", 1500); }
   document.getElementById("inp-valor").value = "";
+  document.getElementById("inp-nota").value = "";
+}
+
+// EXCLUIR LANÇAMENTO INDIVIDUAL
+function excluirLancamento(catId, lancId) {
+  if (!confirm("Excluir este lançamento?")) return;
+  const k = chave(mesSel, catId);
+  if (gastos[k]) {
+    gastos[k] = gastos[k].filter(l => l.id !== lancId);
+    if (gastos[k].length === 0) delete gastos[k];
+  }
+  salvar();
+  renderContent();
 }
 
 function resetarMes() {
@@ -518,23 +749,14 @@ function resetarMes() {
 }
 
 function iniciarSincronizacao() {
-
   firebaseOnSnapshot(
     firebaseDoc(window.firebaseDB, "financeiro", "principal"),
     (snapshot) => {
-
       const dados = snapshot.data();
-
       if (!dados) return;
-
-      gastos = dados.gastos || {};
-
-      categorias =
-        dados.categorias ||
-        JSON.parse(JSON.stringify(CATS_DEFAULT));
-
+      gastos = migrarGastos(dados.gastos || {});
+      categorias = dados.categorias || JSON.parse(JSON.stringify(CATS_DEFAULT));
       orcamento = dados.orcamento || 14000;
-
       renderHeader();
       renderMeses();
       renderContent();
@@ -542,21 +764,17 @@ function iniciarSincronizacao() {
   );
 }
 
-// Init
 function aguardarFirebase() {
-
-  if (!window.firebaseDB) {
-    setTimeout(aguardarFirebase, 200);
-    return;
-  }
-
+  if (!window.firebaseDB) { setTimeout(aguardarFirebase, 200); return; }
   iniciarSincronizacao();
 }
 
+// Init
+tema = localStorage.getItem("cf_tema") || "dark";
+aplicarTema();
 renderHeader();
 renderMeses();
 renderContent();
-
 aguardarFirebase();
 </script>
 </body>
